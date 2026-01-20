@@ -1,87 +1,59 @@
-﻿import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removeFromCart } from "./cartSlice";
+﻿import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Products from "./Products"; // optional
+import Notification from "./Notification";
+import Cart from "./Cart";
 
-const DUMMY_PRODUCTS = [
-  { id: "p1", title: "iPhone", price: 80000 },
-  { id: "p2", title: "Laptop", price: 60000 },
-  { id: "p3", title: "Headphones", price: 2000 }
-];
+import { sendCartData } from "./cart-actions"; // thunk
+import { toggleCart } from "./cartSlice";
+
+let isInitial = true;
 
 function App() {
 
   const dispatch = useDispatch();
+
   const cart = useSelector(state => state.cart);
+  const notification = useSelector(state => state.ui.notification);
+  const showCart = useSelector(state => state.cart.isVisible);
+
+  // API CALL
+  useEffect(() => {
+
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+
+    dispatch(sendCartData(cart));
+
+  }, [cart, dispatch]);
 
   return (
-    <div style={{ padding: 30 }}>
-
-      {/* CART ICON */}
-      <h2>
-        🛒 My Cart ({cart.totalQuantity})
-      </h2>
-
-      <hr />
-
-      {/* PRODUCTS */}
-      <h3>Products</h3>
-
-      {DUMMY_PRODUCTS.map(prod => (
-        <div key={prod.id} style={{ marginBottom: 10 }}>
-          <b>{prod.title}</b> - ₹{prod.price}
-
-          <button
-            style={{ marginLeft: 10 }}
-            onClick={() =>
-              dispatch(addToCart(prod))
-            }
-          >
-            Add To Cart
-          </button>
-        </div>
-      ))}
-
-      <hr />
-
-      {/* CART ITEMS */}
-      <h3>Cart Items</h3>
-
-      {cart.items.length === 0 && (
-        <p>Cart is empty</p>
+    <>
+      {/* NOTIFICATION */}
+      {notification && (
+        <Notification
+          status={notification.status}
+          title={notification.title}
+          message={notification.message}
+        />
       )}
 
-      {cart.items.map(item => (
-        <div
-          key={item.id}
-          style={{
-            border: "1px solid black",
-            marginBottom: 10,
-            padding: 10
-          }}
-        >
-          <h4>{item.title}</h4>
-          <p>Price: ₹{item.price}</p>
-          <p>Quantity: {item.quantity}</p>
+      <header style={{ padding: "20px", background: "#ccc" }}>
+        <h2>Redux Cart App</h2>
 
-          <button
-            onClick={() =>
-              dispatch(addToCart(item))
-            }
-          >
-            +
-          </button>
+        <button onClick={() => dispatch(toggleCart())}>
+          My Cart ({cart.totalQuantity})
+        </button>
+      </header>
 
-          <button
-            onClick={() =>
-              dispatch(removeFromCart(item.id))
-            }
-            style={{ marginLeft: 10 }}
-          >
-            -
-          </button>
-        </div>
-      ))}
+      {/* CART */}
+      {showCart && <Cart />}
 
-    </div>
+      {/* PRODUCTS */}
+      <Products />
+    </>
   );
 }
 
