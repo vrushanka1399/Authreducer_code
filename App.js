@@ -16,9 +16,10 @@ function App() {
 
   const cart = useSelector(state => state.cart);
   const notification = useSelector(state => state.ui.notification);
-  const showCart = useSelector(state => state.cart.isVisible);
 
-  // 🔹 GET cart data on page load
+  const { totalQuantity, isVisible, items } = cart;
+
+  // 🔹 FETCH cart data on page load
   useEffect(() => {
     dispatch(fetchCartData());
   }, [dispatch]);
@@ -31,9 +32,12 @@ function App() {
       return;
     }
 
+    // Prevent sending empty cart on first load
+    if (items.length === 0) return;
+
     dispatch(sendCartData(cart));
 
-  }, [cart, dispatch]);
+  }, [cart, dispatch, items]);
 
   return (
     <>
@@ -46,16 +50,17 @@ function App() {
         />
       )}
 
+      {/* HEADER */}
       <header style={{ padding: "20px", background: "#ccc" }}>
         <h2>Redux Cart App</h2>
 
         <button onClick={() => dispatch(toggleCart())}>
-          My Cart ({cart.totalQuantity})
+          My Cart ({totalQuantity})
         </button>
       </header>
 
       {/* CART */}
-      {showCart && <Cart />}
+      {isVisible && <Cart />}
 
       {/* PRODUCTS */}
       <Products />
