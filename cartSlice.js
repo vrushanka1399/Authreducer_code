@@ -5,11 +5,11 @@ const cartSlice = createSlice({
   initialState: {
     items: [],   // {id, title, price, quantity}
     totalQuantity: 0,
-    isVisible: false   // ?? ADD THIS
+    isVisible: false
   },
   reducers: {
 
-    toggleCart(state) {   // ?? ADD THIS
+    toggleCart(state) {
       state.isVisible = !state.isVisible;
     },
 
@@ -46,6 +46,12 @@ const cartSlice = createSlice({
       } else {
         existingItem.quantity--;
       }
+    },
+
+    // ?? ADD THIS FOR GET API
+    replaceCart(state, action) {
+      state.items = action.payload.items || [];
+      state.totalQuantity = action.payload.totalQuantity || 0;
     }
   }
 });
@@ -53,7 +59,8 @@ const cartSlice = createSlice({
 export const { 
   addToCart, 
   removeFromCart,
-  toggleCart      // ?? EXPORT THIS
+  toggleCart,
+  replaceCart       // ?? EXPORT
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

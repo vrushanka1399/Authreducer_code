@@ -1,10 +1,11 @@
 ﻿import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Products from "./Products"; // optional
+
+import Products from "./Products";
 import Notification from "./Notification";
 import Cart from "./Cart";
 
-import { sendCartData } from "./cart-actions"; // thunk
+import { sendCartData, fetchCartData } from "./cart-actions"; 
 import { toggleCart } from "./cartSlice";
 
 let isInitial = true;
@@ -17,7 +18,12 @@ function App() {
   const notification = useSelector(state => state.ui.notification);
   const showCart = useSelector(state => state.cart.isVisible);
 
-  // API CALL
+  // 🔹 GET cart data on page load
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+
+  // 🔹 SEND cart data when cart changes
   useEffect(() => {
 
     if (isInitial) {
